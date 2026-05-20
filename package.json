@@ -1,0 +1,31 @@
+{
+  "name": "shipdaily",
+  "version": "1.0.0",
+  "description": "Autonomous app-a-day factory: mine trends, generate spec, scaffold Next.js+Supabase app, deploy to Vercel.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "shipdaily": "./src/cli.mjs"
+  },
+  "scripts": {
+    "start": "node src/cli.mjs",
+    "trends": "node src/cli.mjs trends",
+    "spec": "node src/cli.mjs spec",
+    "scaffold": "node src/cli.mjs scaffold",
+    "deploy": "node src/cli.mjs deploy",
+    "full": "node src/cli.mjs full"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.34.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Lee Snedaker",
+  "license": "MIT",
+  "homepage": "https://github.com/snedco/shipdaily",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snedco/shipdaily.git"
+  }
+}

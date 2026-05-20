@@ -1,0 +1,69 @@
+{
+  "name": "TheEntryLevelDevJobsAreD",
+  "slug": "the-entry-level-dev-jobs-are-d",
+  "tagline": "An app responding to: \"The entry level dev jobs are disappearing.\"",
+  "pitch": "This MVP responds to the trend \"The entry level dev jobs are disappearing.\" picked up from r/webdev. It does one thing well.",
+  "target_user": "Indie hackers, early adopters interested in this trend.",
+  "core_feature": "Single-feature app. Replace this stub with the LLM-generated spec by setting ANTHROPIC_API_KEY.",
+  "monetization": "Free for the first N uses, then $9/mo or $99 one-time.",
+  "tables": [
+    {
+      "name": "items",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "references": "auth.users"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "body",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "default": "now()"
+        }
+      ],
+      "rls": "Users see only their own rows."
+    }
+  ],
+  "routes": [
+    {
+      "path": "/",
+      "purpose": "landing + login"
+    },
+    {
+      "path": "/app",
+      "purpose": "main feature, auth required"
+    },
+    {
+      "path": "/api/items",
+      "purpose": "CRUD endpoint"
+    }
+  ],
+  "stretch_features": [
+    "Search",
+    "Tags",
+    "Export"
+  ],
+  "_trend": {
+    "source": "r/webdev",
+    "title": "The entry level dev jobs are disappearing.",
+    "url": "https://reddit.com/r/webdev/comments/1thxgg7/the_entry_level_dev_jobs_are_disappearing/",
+    "score": 314,
+    "comments": 175,
+    "posted_at": "2026-05-19T19:25:01.000Z",
+    "normalizedScore": 314
+  },
+  "markdown": "# TheEntryLevelDevJobsAreD\n\n> An app responding to: \"The entry level dev jobs are disappearing.\"\n\n**Slug:** `the-entry-level-dev-jobs-are-d`\n\n## Pitch\nThis MVP responds to the trend \"The entry level dev jobs are disappearing.\" picked up from r/webdev. It does one thing well.\n\n## Target user\nIndie hackers, early adopters interested in this trend.\n\n## Core feature\nSingle-feature app. Replace this stub with the LLM-generated spec by setting ANTHROPIC_API_KEY.\n\n## Monetization\nFree for the first N uses, then $9/mo or $99 one-time.\n\n## Data model\n### `items`\n\n| Column | Type | Notes |\n|---|---|---|\n| `id` | `uuid` | PK |\n| `user_id` | `uuid` | → auth.users |\n| `title` | `text` |  |\n| `body` | `text` |  |\n| `created_at` | `timestamptz` | default `now()` |\n\n**RLS:** Users see only their own rows.\n\n## Routes\n\n| Path | Purpose |\n|---|---|\n| `/` | landing + login |\n| `/app` | main feature, auth required |\n| `/api/items` | CRUD endpoint |\n\n## Stretch features (not for MVP)\n\n- Search\n- Tags\n- Export\n"
+}

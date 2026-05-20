@@ -1,0 +1,62 @@
+name: Daily App Ship
+
+on:
+  schedule:
+    # 14:00 UTC = 9:00 AM CT — generate today's app and open PR
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+    inputs:
+      trend:
+        description: 'Force a specific trend (otherwise picks top of HN)'
+        required: false
+      deploy:
+        description: 'Deploy to Vercel?'
+        required: false
+        default: 'no'
+        type: choice
+        options: [yes, no]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ship:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install
+        run: npm install
+
+      - name: Mine trends and generate spec
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "${{ github.event.inputs.trend }}" ]; then
+            node src/cli.mjs trends
+            node src/cli.mjs spec --trend "${{ github.event.inputs.trend }}"
+          else
+            node src/cli.mjs full --no-deploy
+          fi
+
+      - name: Commit scaffolded app
+        run: |
+          git config user.name "shipdaily-bot"
+          git config user.email "bot@stackio.ai"
+          git add output/
+          git diff --staged --quiet || git commit -m "Daily ship: $(date -u +%Y-%m-%d)"
+          git pull --rebase origin main || true
+          git push origin main
+
+      - name: Upload as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ github.run_number }}
+          path: output/
+          retention-days: 90
