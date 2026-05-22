@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>shipdaily — Dashboard</title>
+  <meta name="description" content="Live dashboard for the shipdaily app-a-day factory — mined trends and shipped apps.">
+  <meta name="theme-color" content="#0A0A08">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-body: 'DM Sans', -apple-system, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, monospace;
+      --bg: #0A0A08;
+      --bg-elevated: #111110;
+      --bg-card: #161614;
+      --text-primary: #EDE9E3;
+      --text-secondary: #B5B0A8;
+      --text-tertiary: #827E77;
+      --text-muted: #565350;
+      --accent: #4A7C59;
+      --accent-bright: #6FAA82;
+      --accent-glow: rgba(74,124,89,0.12);
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.14);
+      --gold: #D4C896;
+      --orange: #C99A5B;
+      color-scheme: dark;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { font-size:16px; -webkit-font-smoothing:antialiased; }
+    body { font-family:var(--font-body); background:var(--bg); color:var(--text-primary); line-height:1.5; min-height:100vh; }
+    a { color:inherit; text-decoration:none; transition:color 160ms; }
+    a:hover { color:var(--accent-bright); }
+    .container { max-width:1200px; margin:0 auto; padding:0 2rem; }
+
+    nav { position:sticky; top:0; z-index:50; backdrop-filter:blur(12px); background:rgba(10,10,8,0.85); border-bottom:1px solid var(--border); }
+    nav .container { display:flex; align-items:center; justify-content:space-between; padding:1.1rem 2rem; }
+    .brand { font-family:var(--font-mono); font-weight:700; font-size:0.95rem; }
+    .brand span { color:var(--accent-bright); }
+    .nav-links { display:flex; gap:1.5rem; font-size:0.85rem; color:var(--text-secondary); }
+
+    header.hero { padding:3.5rem 0 2rem; }
+    .hero-eyebrow { font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent-bright); margin-bottom:0.9rem; display:flex; align-items:center; gap:0.5rem; }
+    .hero-eyebrow::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent-bright); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    header.hero h1 { font-size:clamp(2rem,4vw,3rem); font-weight:300; letter-spacing:-0.02em; margin-bottom:0.5rem; }
+    header.hero p { color:var(--text-secondary); font-size:1rem; }
+
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin:2rem 0; }
+    .stat { background:var(--bg-elevated); border:1px solid var(--border); border-radius:8px; padding:1.25rem 1.4rem; }
+    .stat .label { font-family:var(--font-mono); font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:0.5rem; }
+    .stat .value { font-family:var(--font-mono); font-size:1.9rem; font-weight:700; letter-spacing:-0.02em; }
+    .stat .value.accent { color:var(--accent-bright); }
+    .stat .value.gold { color:var(--gold); }
+
+    .tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; border-bottom:1px solid var(--border); }
+    .tab { font-family:var(--font-mono); font-size:0.82rem; padding:0.7rem 1.1rem; cursor:pointer; color:var(--text-tertiary); border-bottom:2px solid transparent; transition:all 160ms; background:none; border-top:none; border-left:none; border-right:none; }
+    .tab:hover { color:var(--text-secondary); }
+    .tab.active { color:var(--accent-bright); border-bottom-color:var(--accent-bright); }
+
+    .controls { display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1.25rem; }
+    .controls label { font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-tertiary); }
+    select { font-family:var(--font-mono); font-size:0.85rem; background:var(--bg-card); color:var(--text-primary); border:1px solid var(--border-strong); border-radius:6px; padding:0.5rem 0.75rem; cursor:pointer; }
+    select:focus { outline:none; border-color:var(--accent); }
+    .refresh-btn { font-family:var(--font-mono); font-size:0.8rem; background:var(--accent); color:#fff; border:1px solid var(--accent); border-radius:6px; padding:0.5rem 1rem; cursor:pointer; transition:all 160ms; margin-left:auto; }
+    .refresh-btn:hover { background:var(--accent-bright); color:var(--bg); }
+    .refresh-btn:disabled { opacity:0.5; cursor:wait; }
+
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:1rem; }
+
+    .card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:1.4rem; transition:border-color 200ms, transform 200ms; }
+    .card:hover { border-color:var(--accent); transform:translateY(-2px); }
+    .card .src { font-family:var(--font-mono); font-size:0.68rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent-bright); margin-bottom:0.6rem; display:flex; justify-content:space-between; }
+    .card .src .score { color:var(--gold); }
+    .card h3 { font-size:1rem; font-weight:500; line-height:1.4; margin-bottom:0.75rem; }
+    .card .card-meta { font-family:var(--font-mono); font-size:0.72rem; color:var(--text-tertiary); display:flex; gap:1rem; }
+    .card .card-link { display:inline-block; margin-top:0.85rem; font-family:var(--font-mono); font-size:0.76rem; color:var(--accent-bright); }
+
+    .app-card .tagline { color:var(--text-secondary); font-size:0.88rem; margin-bottom:0.85rem; line-height:1.45; }
+    .app-card .pitch { color:var(--text-tertiary); font-size:0.82rem; line-height:1.5; margin-bottom:1rem; }
+    .app-card h3 { font-size:1.2rem; font-weight:500; margin-bottom:0.4rem; }
+    .app-card .badges { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.85rem; }
+    .badge { font-family:var(--font-mono); font-size:0.66rem; padding:0.15rem 0.45rem; background:var(--accent-glow); color:var(--accent-bright); border-radius:3px; }
+    .badge.gold { background:rgba(212,200,150,0.13); color:var(--gold); }
+    .card-links { display:flex; gap:1rem; padding-top:0.85rem; border-top:1px solid var(--border); }
+
+    .state { padding:4rem 2rem; text-align:center; color:var(--text-tertiary); grid-column:1/-1; }
+    .state .big { font-size:1.1rem; color:var(--text-secondary); margin-bottom:0.5rem; }
+    .state code { font-family:var(--font-mono); background:var(--bg-elevated); padding:0.15rem 0.4rem; border-radius:4px; font-size:0.85rem; color:var(--accent-bright); }
+    .spinner { width:24px; height:24px; border:3px solid var(--border-strong); border-top-color:var(--accent-bright); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1rem; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    footer { padding:3rem 0; margin-top:3rem; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.8rem; }
+    footer .footer-row { display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+
+    .hidden { display:none; }
+
+    @media (max-width:768px) {
+      .container { padding:0 1.1rem; }
+      nav .container { padding:1rem 1.1rem; }
+      .nav-links { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="brand">ship<span>·</span>daily</div>
+    <div class="nav-links">
+      <a href="https://github.com/snedco/shipdaily" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://stackio.ai" target="_blank" rel="noopener">Stackio</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Live pipeline · auto-refreshed from GitHub</div>
+    <h1>shipdaily</h1>
+    <p>Mined trends and shipped apps from the autonomous app-a-day factory.</p>
+  </div>
+</header>
+
+<main class="container">
+  <div class="stats" id="stats">
+    <div class="stat"><div class="label">Apps shipped</div><div class="value accent" id="s-apps">—</div></div>
+    <div class="stat"><div class="label">Trend reports</div><div class="value" id="s-reports">—</div></div>
+    <div class="stat"><div class="label">Signals (latest)</div><div class="value gold" id="s-signals">—</div></div>
+    <div class="stat"><div class="label">Last run</div><div class="value" id="s-lastrun" style="font-size:1.1rem;">—</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="apps">Apps shipped</button>
+    <button class="tab" data-tab="trends">Today's trends</button>
+  </div>
+
+  <!-- APPS TAB -->
+  <div id="tab-apps">
+    <div class="controls">
+      <label>Autonomous Next.js + Supabase apps scaffolded by the factory</label>
+      <button class="refresh-btn" id="refresh-apps">↻ Refresh</button>
+    </div>
+    <div class="grid" id="apps-grid">
+      <div class="state"><div class="spinner"></div><div class="big">Loading shipped apps…</div></div>
+    </div>
+  </div>
+
+  <!-- TRENDS TAB -->
+  <div id="tab-trends" class="hidden">
+    <div class="controls">
+      <label for="trend-report">Report</label>
+      <select id="trend-report"><option>Loading…</option></select>
+      <label for="trend-source">Source</label>
+      <select id="trend-source"><option value="all">All sources</option></select>
+      <button class="refresh-btn" id="refresh-trends">↻ Refresh</button>
+    </div>
+    <div class="grid" id="trends-grid">
+      <div class="state"><div class="spinner"></div><div class="big">Loading trends…</div></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <div>ship·daily dashboard · reads live from <a href="https://github.com/snedco/shipdaily" target="_blank" rel="noopener">snedco/shipdaily</a></div>
+      <div>A Stackio.ai tool · Austin, TX</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const REPO = 'snedco/shipdaily';
+const OUTPUT_API = `https://api.github.com/repos/${REPO}/contents/output?ref=main`;
+
+let outputEntries = [];   // raw GitHub contents listing
+let trendReports = [];    // [{name, download_url}]
+let currentTrends = null;
+
+const $ = id => document.getElementById(id);
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }); }
+  catch { return iso; }
+}
+function relDate(iso) {
+  if (!iso) return '';
+  const diff = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diff/3600000);
+  if (h < 1) return 'just now';
+  if (h < 24) return h + 'h ago';
+  return Math.floor(h/24) + 'd ago';
+}
+
+async function loadOutputListing() {
+  const resp = await fetch(OUTPUT_API);
+  if (resp.status === 403) throw new Error('rate-limit');
+  if (resp.status === 404) return [];
+  if (!resp.ok) throw new Error('http-' + resp.status);
+  return resp.json();
+}
+
+async function fetchJson(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error('fetch-failed');
+  return resp.json();
+}
+
+// ---- APPS ----
+async function loadApps() {
+  $('refresh-apps').disabled = true;
+  try {
+    if (outputEntries.length === 0) outputEntries = await loadOutputListing();
+    const appDirs = outputEntries.filter(e => e.type === 'dir');
+
+    $('s-reports').textContent = outputEntries.filter(e => e.name.startsWith('trends-')).length;
+
+    if (appDirs.length === 0) {
+      $('s-apps').textContent = '0';
+      $('apps-grid').innerHTML = `<div class="state"><div class="big">No apps shipped yet</div><div>Run the factory: <code>node src/cli.mjs full</code></div></div>`;
+      return;
+    }
+
+    $('s-apps').textContent = appDirs.length;
+
+    // Fetch spec.json for each app dir
+    const apps = [];
+    for (const dir of appDirs.reverse()) {  // newest first
+      try {
+        const specUrl = `https://raw.githubusercontent.com/${REPO}/main/output/${dir.name}/spec.json`;
+        const spec = await fetchJson(specUrl);
+        apps.push({ dir: dir.name, spec });
+      } catch {
+        apps.push({ dir: dir.name, spec: null });
+      }
+    }
+
+    $('apps-grid').innerHTML = apps.map(({dir, spec}) => {
+      const repoName = `shipdaily-${spec?.slug || dir}`;
+      const tableCount = spec?.tables?.length ?? '?';
+      const routeCount = spec?.routes?.length ?? '?';
+      const date = dir.slice(0, 10);
+      return `<div class="card app-card">
+        <div class="src"><span>${date}</span><span>${spec?._trend?.source || ''}</span></div>
+        <h3>${spec?.name || dir}</h3>
+        <div class="tagline">${spec?.tagline || 'Scaffolded app (spec unavailable)'}</div>
+        <div class="badges">
+          <span class="badge">${tableCount} tables</span>
+          <span class="badge">${routeCount} routes</span>
+          ${spec?.monetization ? '<span class="badge gold">monetized</span>' : ''}
+        </div>
+        <div class="pitch">${(spec?.pitch || '').slice(0, 180)}</div>
+        <div class="card-links">
+          <a href="https://github.com/${REPO}/tree/main/output/${dir}" target="_blank" rel="noopener">View scaffold →</a>
+          <a href="https://github.com/${REPO}/blob/main/output/${dir}/SPEC.md" target="_blank" rel="noopener">Spec →</a>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    if (e.message === 'rate-limit') showRateLimit('apps-grid');
+    else $('apps-grid').innerHTML = `<div class="state"><div class="big">Couldn't load apps</div><div>${e.message}</div></div>`;
+  } finally {
+    $('refresh-apps').disabled = false;
+  }
+}
+
+// ---- TRENDS ----
+async function loadTrendReports() {
+  if (outputEntries.length === 0) outputEntries = await loadOutputListing();
+  trendReports = outputEntries
+    .filter(e => e.type === 'file' && e.name.startsWith('trends-') && e.name.endsWith('.json'))
+    .map(e => ({ name: e.name.replace('trends-','').replace('.json',''), download_url: e.download_url }))
+    .sort((a,b) => b.name.localeCompare(a.name));
+}
+
+function renderTrends() {
+  if (!currentTrends) return;
+  const srcFilter = $('trend-source').value;
+  let rows = [...currentTrends];
+  if (srcFilter !== 'all') rows = rows.filter(t => t.source === srcFilter);
+  rows.sort((a,b) => (b.normalizedScore ?? b.score) - (a.normalizedScore ?? a.score));
+
+  if (rows.length === 0) {
+    $('trends-grid').innerHTML = `<div class="state"><div class="big">No trends for this source.</div></div>`;
+    return;
+  }
+
+  $('trends-grid').innerHTML = rows.slice(0, 60).map(t => `<div class="card">
+    <div class="src"><span>${t.source}</span><span class="score">▲ ${t.score}</span></div>
+    <h3>${escapeHtml(t.title)}</h3>
+    <div class="card-meta">
+      <span>${t.comments ?? 0} comments</span>
+      <span>${relDate(t.posted_at)}</span>
+    </div>
+    ${t.url ? `<a class="card-link" href="${t.url}" target="_blank" rel="noopener">Open source →</a>` : ''}
+  </div>`).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadTrends() {
+  $('refresh-trends').disabled = true;
+  try {
+    await loadTrendReports();
+    if (trendReports.length === 0) {
+      $('trends-grid').innerHTML = `<div class="state"><div class="big">No trend reports yet</div><div>Run: <code>node src/cli.mjs trends</code></div></div>`;
+      return;
+    }
+    $('trend-report').innerHTML = trendReports.map(r => `<option value="${r.download_url}">${r.name}</option>`).join('');
+    currentTrends = await fetchJson(trendReports[0].download_url);
+
+    // populate source filter
+    const sources = [...new Set(currentTrends.map(t => t.source))].sort();
+    $('trend-source').innerHTML = `<option value="all">All sources</option>` +
+      sources.map(s => `<option value="${s}">${s}</option>`).join('');
+
+    $('s-signals').textContent = currentTrends.length;
+    renderTrends();
+  } catch (e) {
+    if (e.message === 'rate-limit') showRateLimit('trends-grid');
+    else $('trends-grid').innerHTML = `<div class="state"><div class="big">Couldn't load trends</div><div>${e.message}</div></div>`;
+  } finally {
+    $('refresh-trends').disabled = false;
+  }
+}
+
+function showRateLimit(gridId) {
+  $(gridId).innerHTML = `<div class="state">
+    <div class="big">GitHub API rate-limited</div>
+    <div>This dashboard reads live from GitHub's public API (60 req/hour, unauthenticated).</div>
+    <div style="margin-top:1rem;">Wait a few minutes and hit <code>↻ Refresh</code>, or browse the <a href="https://github.com/${REPO}/tree/main/output" target="_blank" rel="noopener" style="color:var(--accent-bright)">output folder</a>.</div>
+  </div>`;
+}
+
+// ---- TABS ----
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const which = tab.dataset.tab;
+    $('tab-apps').classList.toggle('hidden', which !== 'apps');
+    $('tab-trends').classList.toggle('hidden', which !== 'trends');
+    if (which === 'trends' && !currentTrends) loadTrends();
+  });
+});
+
+$('trend-report').addEventListener('change', async (e) => {
+  $('trends-grid').innerHTML = `<div class="state"><div class="spinner"></div><div class="big">Loading…</div></div>`;
+  currentTrends = await fetchJson(e.target.value);
+  const sources = [...new Set(currentTrends.map(t => t.source))].sort();
+  $('trend-source').innerHTML = `<option value="all">All sources</option>` + sources.map(s => `<option value="${s}">${s}</option>`).join('');
+  $('s-signals').textContent = currentTrends.length;
+  renderTrends();
+});
+$('trend-source').addEventListener('change', renderTrends);
+$('refresh-apps').addEventListener('click', () => { outputEntries = []; loadApps(); });
+$('refresh-trends').addEventListener('click', () => { outputEntries = []; trendReports = []; currentTrends = null; loadTrends(); });
+
+async function init() {
+  await loadApps();
+  // set last-run from newest output entry or trend report
+  const trendFiles = outputEntries.filter(e => e.name.startsWith('trends-'));
+  if (trendFiles.length) {
+    const newest = trendFiles.map(e => e.name.replace('trends-','').replace('.json','')).sort().pop();
+    $('s-lastrun').textContent = newest || '—';
+  }
+}
+init();
+</script>
+
+</body>
+</html>
